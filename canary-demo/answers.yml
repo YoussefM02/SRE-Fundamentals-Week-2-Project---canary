@@ -1,35 +1,66 @@
 # Deployment Information
 pods_status:
-  main_pods_running: #TODO: Enter number of main pods running
-  canary_pods_running: #TODO: Enter number of canary pods running
+  main_pods_running: 3
+  canary_pods_running: 1
+
+# @YoussefM02 ➜ /workspaces/SRE-Fundamentals-Week-2-Project---canary/canary-demo (main) $ kubectl get pods -n canary-demo 
+# NAME                                                     READY   STATUS    RESTARTS   AGE
+# alertmanager-prometheus-kube-prometheus-alertmanager-0   2/2     Running   0          70m
+# canary-demo-canary-84bcf9cd4d-hrfzl                      1/1     Running   0          3m2s
+# canary-demo-d655c9c44-89qsg                              1/1     Running   0          12m
+# canary-demo-d655c9c44-kf4ht                              1/1     Running   0          12m
+# canary-demo-d655c9c44-tc629                              1/1     Running   0          12m
+# prometheus-grafana-5f78b56899-6dhc4                      3/3     Running   0          71m
+# prometheus-kube-prometheus-operator-78fbb994b9-crztm     1/1     Running   0          71m
+# prometheus-kube-state-metrics-7fb964d669-zn4qw           1/1     Running   0          71m
+# prometheus-prometheus-kube-prometheus-prometheus-0       2/2     Running   0          70m
+# prometheus-prometheus-node-exporter-pcjq7                1/1     Running   0          71m
 
 # Service Information
 service_endpoints:
-  main_service_cluster_ip: #TODO: Enter the ClusterIP of main service
-  canary_service_cluster_ip: #TODO: Enter the ClusterIP of canary service
+  main_service_cluster_ip: 10.101.83.66
+  canary_service_cluster_ip: 10.105.84.55
+
+# @YoussefM02 ➜ /workspaces/SRE-Fundamentals-Week-2-Project---canary/canary-demo (main) $ kubectl get svc -n canary-demo 
+# NAME                                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+# alertmanager-operated                     ClusterIP   None            <none>        9093/TCP,9094/TCP,9094/UDP   71m
+# canary-demo                               ClusterIP   10.101.83.66    <none>        80/TCP                       12m
+# canary-demo-canary                        ClusterIP   10.105.84.55    <none>        80/TCP                       12m
+# prometheus-grafana                        ClusterIP   10.96.160.240   <none>        80/TCP                       71m
+# prometheus-kube-prometheus-alertmanager   ClusterIP   10.108.71.140   <none>        9093/TCP,8080/TCP            71m
+# prometheus-kube-prometheus-operator       ClusterIP   10.106.9.134    <none>        443/TCP                      71m
+# prometheus-kube-prometheus-prometheus     ClusterIP   10.97.222.35    <none>        9090/TCP,8080/TCP            71m
+# prometheus-kube-state-metrics             ClusterIP   10.98.112.89    <none>        8080/TCP                     71m
+# prometheus-operated                       ClusterIP   None            <none>        9090/TCP                     71m
+# prometheus-prometheus-node-exporter       ClusterIP   10.98.171.38    <none>        9100/TCP                     71m
 
 # Ingress Information
 ingress_details:
-  address: #TODO: Enter the Ingress controller IP address
-  host: #TODO: Enter the configured host (should be canary-demo.local)
+  address: 192.168.49.2
+  host: canary-demo.local
+# @YoussefM02 ➜ /workspaces/SRE-Fundamentals-Week-2-Project---canary/canary-demo (main) $ kubectl get ingress -n canary-demo 
+# NAME                       CLASS   HOSTS               ADDRESS        PORTS   AGE
+# canary-demo-ingress        nginx   canary-demo.local   192.168.49.2   80      13m
+# canary-demo-main-ingress   nginx   canary-demo.local   192.168.49.2   80      13m
 
 # Metrics
 main_deployment_metrics:
-  http_requests_total: #TODO: Enter the value from main deployment's /metrics endpoint
-  process_cpu_seconds_total: #TODO: Enter the CPU seconds from main deployment
-  process_resident_memory_bytes: #TODO: Enter the memory usage from main deployment
+  http_requests_total: http_requests_total{version="v1"} 19.0
+  process_cpu_seconds_total: process_cpu_seconds_total 0.45999999999999996
+  process_resident_memory_bytes: process_resident_memory_bytes 3.2145408e+07
+
 
 canary_deployment_metrics:
-  http_requests_total: #TODO: Enter the value from canary deployment's /metrics endpoint
-  process_cpu_seconds_total: #TODO: Enter the CPU seconds from canary deployment
-  process_resident_memory_bytes: #TODO: Enter the memory usage from canary deployment
+  http_requests_total: http_requests_total{version="v2"} 6.0
+  process_cpu_seconds_total: process_cpu_seconds_total 0.3
+  process_resident_memory_bytes: process_resident_memory_bytes 3.2751616e+07
 
 # Traffic Distribution Test
 traffic_test_results:
-  total_requests_sent: #TODO: Enter how many test requests you sent (should be 20)
-  main_responses_received: #TODO: Enter how many responses were from main deployment
-  canary_responses_received: #TODO: Enter how many responses were from canary deployment
-  actual_canary_percentage: #TODO: Calculate the actual percentage of canary traffic
+  total_requests_sent: 20
+  main_responses_received: 16
+  canary_responses_received: 4
+  actual_canary_percentage: 20%
 
 # Prometheus Queries
 prometheus_metrics:
@@ -38,16 +69,16 @@ prometheus_metrics:
 
 # Rollback Test
 rollback_test:
-  previous_revision: #TODO: Enter the revision number before rollback
-  rollback_command_used: #TODO: Enter the helm rollback command you used
-  time_to_rollback_seconds: #TODO: Enter how long the rollback took to complete
+  previous_revision: 1
+  rollback_command_used: helm rollback canary-demo 1 -n canary-demo
+  time_to_rollback_seconds: > 1 sec
 
 # Error Budget Calculation (based on 99.9% SLO)
 error_budget:
-  monthly_error_budget_seconds: #TODO: Calculate and enter the monthly error budget in seconds
-  remaining_error_budget_percentage: #TODO: Enter current remaining error budget percentage
-
+  monthly_error_budget_seconds: 2592.00
+  remaining_error_budget_percentage: 100.00%
+  c
 # Additional Observations
 observations:
-  unexpected_behaviors: #TODO: List any unexpected behaviors you observed
+  unexpected_behaviors: promethues was not able to gather data from app, so grafana was not working 
   suggested_improvements: #TODO: List any improvements you would suggest
